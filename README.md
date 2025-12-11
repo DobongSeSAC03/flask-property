@@ -132,21 +132,31 @@ flask run
 
 ## Git 전략 및 협업 규칙
 
-이 프로젝트의 규모와 특성에 맞춰 가볍고 효율적인 **Feature Branch Workflow**를 권장합니다.
-`main` 브랜치는 항상 안정적인 상태를 유지하며, 모든 개발은 별도의 기능 브랜치에서 진행 후 병합(Merge/Squash)합니다.
+프로젝트의 체계적인 관리를 위해 **Git-Flow** 방식을 도입하여 `main`, `develop`, `feature` 브랜치를 운영합니다.
+또한, **GitHub Issues**와 연동하여 이슈 단위로 작업을 관리합니다.
 
-### 1. 브랜치 전략 (Feature Branch Workflow)
+### 1. 브랜치 전략
 
 - **`main`**: 
-  - 제품으로 배포 가능한 상태의 코드를 관리합니다. (Production-ready)
-  - 직접 커밋을 지양하고 PR(Pull Request)을 통해서만 병합합니다.
+  - 언제든지 제품으로 배포 가능한 **안정적인 상태(Production)**를 유지합니다.
+  - `develop` 브랜치에서 충분히 검증된 코드만 병합됩니다.
+
+- **`develop`**: 
+  - 다음 배포를 위해 개발 중인 기능을 통합하는 **개발 중심 브랜치**입니다.
+  - 모든 Feature 브랜치는 이곳으로 병합되어 테스트됩니다.
 
 - **`feature/*`**:
-  - 새로운 기능 개발이나 버그 수정을 위한 브랜치입니다.
-  - `main` 브랜치에서 생성하며, 작업 완료 후 `main`으로 병합됩니다.
-  - 명명 규칙: `feature/기능요약` (예: `feature/login-api`, `feature/user-model`)
+  - 새로운 기능 개발, 버그 수정 등을 위한 브랜치입니다.
+  - `develop` 브랜치에서 생성하며, 작업 완료 후 다시 `develop`으로 병합(PR)합니다.
 
-### 2. 커밋 메시지 규칙 (Conventional Commits)
+### 2. Feature 브랜치 명명 규칙 (GitHub Issue 연동)
+
+모든 작업은 **GitHub Issue** 생성 후 시작하며, 이슈 보드에서 생성된 브랜치 이름을 사용합니다.
+
+- **규칙**: GitHub Issue 페이지의 `Create a branch` 기능을 통해 자동 생성된 이름을 그대로 사용합니다.
+- **예시**: `1-login-function` (이슈번호-제목)
+
+### 3. 커밋 메시지 규칙 (Conventional Commits)
 
 명확한 변경 이력 관리를 위해 **Angular Commit Convention**을 따릅니다.
 
