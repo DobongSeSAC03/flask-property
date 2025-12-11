@@ -124,6 +124,55 @@ flask run
 
 애플리케이션은 `http://127.0.0.1:5000/`에서 확인할 수 있습니다.
 
+### 3. VS Code 디버깅 설정 (Optional)
+
+Visual Studio Code에서 디버깅 기능을 사용하려면 `.vscode/launch.json` 파일을 생성하여 다음과 같이 설정합니다.
+
+**.vscode/launch.json**:
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        // =============================================================
+        // [1] Flask 설정
+        // =============================================================
+        {
+            "name": "부동산 데이터 App", // VS Code 디버그 드롭다운에 표시될 이름
+            "type": "python", // 디버그 유형: 파이썬
+            "request": "launch", // 실행(launch) 요청
+            "module": "flask", // 'flask' 모듈을 실행
+            "env": {
+                // FLASK_APP 환경 변수 설정: cwd(app_microservice) 폴더 내의 run.py 파일을 시작 파일로 지정
+                "FLASK_APP": "run.py",
+                "FLASK_DEBUG": "1" // 디버그 모드 활성화 (오류 발생 시 상세 정보 표시)
+            },
+            "args": [
+                "run",
+                "--no-debugger", // VS Code 자체 디버거를 사용하므로 Flask의 내장 디버거는 비활성화
+                // "--no-reload" // VS Code 자체 디버거를 사용하므로 Flask의 리로더도 비활성화
+            ],
+            "jinja": true, // Flask 템플릿(Jinja2) 디버깅 지원 활성화
+            // ⭐ 현재 작업 디렉토리(루트 경로) 설정
+            // 이 경로부터 상대 경로(예: FLASK_APP: "run.py")가 시작됩니다.
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true // 사용자 코드만 디버그하고 외부 라이브러리 코드는 건너뜁니다.
+        },
+        // =============================================================
+        // [3] Python: Current File 설정 (일반적인 파이썬 스크립트 실행)
+        // 현재 열려있는 Python 파일을 일반 스크립트로 디버그합니다.
+        // =============================================================
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}", // 현재 VS Code에서 활성화된 파일(.py)을 실행
+            "console": "integratedTerminal", // 출력을 VS Code 내장 터미널로 보냄
+            "justMyCode": true
+        }
+    ]
+}
+```
+
 ## API 엔드포인트
 
 - `/`: 메인 인덱스 라우트.

@@ -1,16 +1,16 @@
-blinker==1.9.0
-click==8.3.1
-dnspython==2.8.0
-email-validator==2.3.0
-Flask==3.1.2
-Flask-DebugToolbar==0.16.0
-Flask-Mail==0.10.0
-Flask-SQLAlchemy==3.1.1
-idna==3.11
-itsdangerous==2.2.0
-Jinja2==3.1.6
-MarkupSafe==3.0.3
-python-dotenv==1.2.1
-SQLAlchemy==2.0.45
-typing_extensions==4.15.0
-Werkzeug==3.1.4
+blinker==1.9.0              # 시그널 처리를 위한 라이브러리
+click==8.3.1                # CLI(Command Line Interface) 구축을 위한 패키지
+dnspython==2.8.0            # DNS 툴킷
+email-validator==2.3.0      # 이메일 주소 유효성 검사
+Flask==3.1.2                # Python 마이크로 웹 프레임워크
+Flask-DebugToolbar==0.16.0  # 개발 디버깅용 툴바
+Flask-Mail==0.10.0          # 메일 발송 확장 기능
+Flask-SQLAlchemy==3.1.1     # Flask용 SQLAlchemy(ORM) 통합
+idna==3.11                  # 국제 도메인 이름(IDNA) 지원
+itsdangerous==2.2.0         # 데이터 서명 및 무결성 검사
+Jinja2==3.1.6               # Flask 기본 템플릿 엔진
+MarkupSafe==3.0.3           # XML/HTML/XHTML 안전한 문자열 처리
+python-dotenv==1.2.1        # .env 파일 환경 변수 로드
+SQLAlchemy==2.0.45          # Python SQL 툴킷 및 ORM
+typing_extensions==4.15.0   # Python 타이핑 확장 기능
+Werkzeug==3.1.4             # WSGI 유틸리티 라이브러리 (Flask 코어)
