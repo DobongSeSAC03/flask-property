@@ -1,10 +1,8 @@
 blinker==1.9.0              # 시그널 처리를 위한 라이브러리
 click==8.3.1                # CLI(Command Line Interface) 구축을 위한 패키지
-dnspython==2.8.0            # DNS 툴킷
-email-validator==2.3.0      # 이메일 주소 유효성 검사
+email-validator==2.3.0      # 이메일 주소 유효성 검사 (Marshmallow 등에서 사용)
 Flask==3.1.2                # Python 마이크로 웹 프레임워크
 Flask-DebugToolbar==0.16.0  # 개발 디버깅용 툴바
-Flask-Mail==0.10.0          # 메일 발송 확장 기능
 Flask-SQLAlchemy==3.1.1     # Flask용 SQLAlchemy(ORM) 통합
 idna==3.11                  # 국제 도메인 이름(IDNA) 지원
 itsdangerous==2.2.0         # 데이터 서명 및 무결성 검사

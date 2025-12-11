@@ -107,6 +107,9 @@ DEV_DATABASE_URL=sqlite:///dev.db
 DATABASE_URL=postgresql://user:password@localhost/dbname
 ```
 
+> **참고**: `Flask-DebugToolbar`가 `run.py`에 설정되어 있어, 개발 모드 실행 시 브라우저에서 디버그 툴바를 사용할 수 있습니다. `config.py`의 `SECRET_KEY`가 반드시 설정되어 있어야 합니다. `DebugToolbarExtension(app)`를 통해 활성화됩니다.
+
+
 ### 2. 애플리케이션 실행
 
 환경 변수가 설정되어 있다면 다음 명령어로 바로 실행할 수 있습니다.
@@ -158,7 +161,7 @@ Visual Studio Code에서 디버깅 기능을 사용하려면 `.vscode/launch.jso
             "justMyCode": true // 사용자 코드만 디버그하고 외부 라이브러리 코드는 건너뜁니다.
         },
         // =============================================================
-        // [3] Python: Current File 설정 (일반적인 파이썬 스크립트 실행)
+        // [2] Python: Current File 설정 (일반적인 파이썬 스크립트 실행)
         // 현재 열려있는 Python 파일을 일반 스크립트로 디버그합니다.
         // =============================================================
         {
@@ -213,8 +216,10 @@ Visual Studio Code에서 디버깅 기능을 사용하려면 `.vscode/launch.jso
 ```plaintext
 <type>: <subject>
 
-<body>
+ - <body1>
+ - <body2>
 ```
+> **참고**: 내용이 짧으면 body 없이 작성할 수 있습니다.
 
 **Type 종류:**
 - `feat`: 새로운 기능 추가
@@ -229,5 +234,6 @@ Visual Studio Code에서 디버깅 기능을 사용하려면 `.vscode/launch.jso
 ```plaintext
 feat: 사용자 로그인 API 구현
 
-JWT를 이용한 로그인 인증 로직 추가
+- JWT를 이용한 로그인 인증 로직 추가
+- 사용자 정보 관리 모델 구현
 ```
