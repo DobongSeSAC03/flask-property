@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}로그인 - Microservice App{% endblock %}
+
+{% block content %}
+<h1>APIs</h1>
+<ul>
+    <li><a href="{{ url_for('api.get_real_estate_transactions') }}">Real Estate Transactions</a></li>
+    <li><a href="{{ url_for('api.get_public_parkings') }}">Public Parkings</a></li>
+</ul>
+{% endblock %}

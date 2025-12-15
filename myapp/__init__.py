@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import config
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 
@@ -9,6 +10,10 @@ def create_app(config_name='default'):
     app.config.from_object(config[config_name])
 
     db.init_app(app)
+
+    Migrate(app, db)
+
+    from myapp import models
 
     from myapp.auth import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
