@@ -85,6 +85,23 @@ project_root/
    deactivate
    ```
 
+
+
+### 5. 데이터베이스별 필수 의존성 설치 (SQLAlchemy)
+
+프로젝트에서 사용하는 데이터베이스에 따라 추가 드라이버 설치가 필요할 수 있습니다.
+
+| 데이터베이스 | 라이브러리 | 설치 명령어 | 연결 URI 예시 | 비고 |
+|---|---|---|---|---|
+| **PostgreSQL** | `psycopg2` | `pip install psycopg2-binary` | `postgresql://user:password@host:5432/dbname` | 개발환경 권장 (프로덕션: `psycopg2`) |
+| **MySQL / MariaDB** | `pymysql` | `pip install pymysql` | `mysql+pymysql://user:password@host:3306/dbname` | - |
+| **MySQL / MariaDB** | `mysqlclient` | `pip install mysqlclient` | `mysql://user:password@host:3306/dbname` | C 확장 모듈 (설치 시 시스템 의존성 필요) |
+| **SQLite** | - | - | `sqlite:///path/to/database.db` | Python 내장 라이브러리 (설치 불필요) |
+| **Oracle** | `cx_Oracle` | `pip install cx_Oracle` | `oracle://user:password@host:1521/sid` | - |
+| **MS SQL Server** | `pyodbc` | `pip install pyodbc` | `mssql+pyodbc://user:password@host:1433/dbname?driver=ODBC+Driver+17+for+SQL+Server` | ODBC 드라이버 필요 |
+
+> **참고**: `requirements.txt`에 포함되지 않은 경우 위 명령어로 직접 설치해 주십시오.
+
 ## 환경 설정 및 실행 (Configuration & Running)
 
 애플리케이션 실행 전 환경 변수 설정이 필요합니다. `.flaskenv`와 `.env` 파일을 통해 설정을 관리할 수 있습니다.

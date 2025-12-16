@@ -18,6 +18,8 @@ def setup_db_context():
     # 기본 설정(Development)으로 앱 생성
     app = create_app('default')
     ctx = app.app_context()
+    # Flask 애플리케이션 컨텍스트를 푸시하여 `current_app`, `db` 등과 같은 애플리케이션 의존적인 객체들을
+    # 요청 컨텍스트 외부(예: Jupyter 노트북)에서 사용할 수 있도록 합니다.
     ctx.push()
 
     print("데이터베이스 연결 및 앱 컨텍스트 푸시 완료.")
