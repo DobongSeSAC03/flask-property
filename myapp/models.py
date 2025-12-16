@@ -14,7 +14,7 @@ class RealEstateTransaction(db.Model):
     jibun_type_name = db.Column(db.String(50))  # 지번구분명
     main_number = db.Column(db.String(10))  # 본번
     sub_number = db.Column(db.String(10))  # 부번
-    building_name = db.Column(db.String(100))  # 건물명
+    building_name = db.Column(db.String(150))  # 건물명
     contract_date = db.Column(db.String(8))  # 계약일
     amount = db.Column(db.BigInteger)  # 물건금액(만원)
     building_area = db.Column(db.Float)  # 건물면적(㎡)
@@ -25,7 +25,7 @@ class RealEstateTransaction(db.Model):
     construction_year = db.Column(db.Integer)  # 건축년도
     building_use = db.Column(db.String(50))  # 건물용도
     declaration_type = db.Column(db.String(50))  # 신고구분
-    broker_district_name = db.Column(db.String(100))  # 신고한 개업공인중개사 시군구명
+    broker_district_name = db.Column(db.String(200))  # 신고한 개업공인중개사 시군구명
 
     def __repr__(self):
         return f'<RealEstateTransaction {self.id} {self.building_name}>'
@@ -35,15 +35,15 @@ class PublicParking(db.Model):
 
     pp_id = db.Column(db.Integer, primary_key=True)
     parking_code = db.Column(db.String(20))  # 주차장코드
-    parking_name = db.Column(db.String(100))  # 주차장명
-    address = db.Column(db.String(200))  # 주소
+    parking_name = db.Column(db.String(150))  # 주차장명
+    address = db.Column(db.String(255))  # 주소
     parking_type = db.Column(db.String(20))  # 주차장 종류
     parking_type_name = db.Column(db.String(50))  # 주차장 종류명
     operation_type = db.Column(db.String(20))  # 운영구분
     operation_type_name = db.Column(db.String(50))  # 운영구분명
     phone_number = db.Column(db.String(20))  # 전화번호
     parking_status_available = db.Column(db.String(1))  # 주차현황 정보 제공여부
-    parking_status_available_name = db.Column(db.String(10))  # 주차현황 정보 제공여부명
+    parking_status_available_name = db.Column(db.String(100))  # 주차현황 정보 제공여부명
     total_spaces = db.Column(db.Integer)  # 총 주차면
     current_parking = db.Column(db.Integer)  # 현재 주차 차량수
     current_parking_update_time = db.Column(db.String(50))  # 현재 주차 차량수 업데이트시간
@@ -76,8 +76,8 @@ class PublicParking(db.Model):
     lng = db.Column(db.Float)  # 주차장 위치 좌표 경도
     share_parking_company_name = db.Column(db.String(50))  # 공유 주차장 관리업체명
     share_parking = db.Column(db.String(1))  # 공유 주차장 여부
-    share_parking_company_link = db.Column(db.String(200))  # 공유 주차장 관리업체 링크
-    share_parking_etc = db.Column(db.String(200))  # 공유 주차장 기타사항
+    share_parking_company_link = db.Column(db.String(512))  # 공유 주차장 관리업체 링크
+    share_parking_etc = db.Column(db.String(512))  # 공유 주차장 기타사항
 
     def __repr__(self):
         return f'<PublicParking {self.parking_code} {self.parking_name}>'
