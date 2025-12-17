@@ -24,4 +24,10 @@ def create_app(config_name='default'):
     from myapp.main import main_bp
     app.register_blueprint(main_bp, url_prefix='/')
 
+    from myapp.query import query_bp
+    app.register_blueprint(query_bp, url_prefix='/query')
+
+    from myapp.predict import predict_bp
+    app.register_blueprint(predict_bp, url_prefix='/predict')
+
     return app
