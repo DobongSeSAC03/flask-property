@@ -12,5 +12,4 @@ uploads/
 .env
 data/
 migrations/
-
 .DS_Store
