@@ -16,9 +16,10 @@ def predict_by_loaction():
     data = request.get_json()
     input_district_name = data.get('district')
     input_legal_dong_name = data.get('dong')
+    input_building_use = data.get('building_type')
 
     # SQLAlchemy를 사용하여 데이터 가져오기
-    transactions = RealEstateTransaction.query.limit(5).all()
+    # transactions = RealEstateTransaction.query.limit(5).all()
     # print(f"가져온 거래 수: {len(transactions)}")
 
     # DataFrame으로 변환
