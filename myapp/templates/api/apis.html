@@ -4,8 +4,44 @@
 
 {% block content %}
 <h1>APIs</h1>
-<ul>
-    <li><a href="{{ url_for('api.get_real_estate_transactions') }}">Real Estate Transactions</a></li>
-    <li><a href="{{ url_for('api.get_public_parkings') }}">Public Parkings</a></li>
-</ul>
+<div style="display: flex; gap: 20px;">
+    <ul style="flex: 1;">
+        {% for api in apis %}
+        <li>
+            <a href="#" onclick="getApi('{{ api.endpoint }}', '{{ api.id }}', '{{ api.method }}')">{{ api.name }}</a>
+            <p style="font-size: 12px;">설명 : {{ api.description }}</p>
+            <p style="font-size: 12px;">메소드 : {{ api.method }}</p>
+            <p style="font-size: 12px;">샘플 : {{ api.data_sample }}</p>
+            <p style="font-size: 12px;">데이터</p>
+            <textarea id="{{ api.id }}" style="font-size: 12px;"></textarea>
+        </li>
+        {% endfor %}
+    </ul>
+    <div id="result" style="flex: 3;">
+        <textarea id="result-textarea" rows="20" style="width: 100%;" readonly></textarea>
+    </div>
+</div>
+<script>
+    function getApi(apiEndpoint, apiId, apiMethod) {
+        data = document.getElementById(apiId).value;
+        console.log(data);
+        fetch(
+            apiEndpoint,
+            {
+                method: apiMethod,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: data
+            }
+        )
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result-textarea').value = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Error fetching api:', error);
+            });
+    }
+</script>
 {% endblock %}
