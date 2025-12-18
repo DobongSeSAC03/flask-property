@@ -30,4 +30,7 @@ def create_app(config_name='default'):
     from myapp.predict import predict_bp
     app.register_blueprint(predict_bp, url_prefix='/predict')
 
+    from myapp.parking import parking_bp
+    app.register_blueprint(parking_bp, url_prefix='/parking')
+
     return app
