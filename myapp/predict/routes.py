@@ -26,6 +26,9 @@ def predict_by_loaction():
     stmt = select(RealEstateTransaction)
     df_ret = pd.read_sql(stmt, db.session.connection())
 
+    # 건물 유형 필터링
+    def filter_by_building_type(df, building_type):
+        return df[df['building_use'] == building_type].copy()
 
     # 지역구 필터링
     def filter_by_district(df, district_name):
