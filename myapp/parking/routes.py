@@ -50,7 +50,7 @@ def parking():
     if input_dong_name is not None:
         result = result[result['Area_Dong'] == input_dong_name]
     
-    result=result.to_dict()
+    result=result.to_dict(orient='records')
 
     return jsonify(result)
 
