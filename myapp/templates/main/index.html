@@ -144,6 +144,7 @@
         let labelsBuilding = [];
         let datasetsBuilding = {};
         let maxAmount = 0;
+        let minAmount = 0;
         buildingData.forEach(item => {
             if (item.building_use === '아파트') {
                 labelsBuilding.push(item.reception_year);
@@ -155,8 +156,12 @@
             if (maxAmount < item.avg_price_per_sqm) {
                 maxAmount = item.avg_price_per_sqm;
             }
+            if (minAmount > item.avg_price_per_sqm) {
+                minAmount = item.avg_price_per_sqm;
+            }
         });
-        maxAmount = Math.ceil(maxAmount / 1000000) * 1000000;
+        // maxAmount = Math.ceil(maxAmount / 1000000) * 1000000;
+        // minAmount = Math.floor(minAmount / 1000000) * 1000000;
         // Area Chart Example
         var ctx = document.getElementById("myAreaChart");
         var myLineChart = new Chart(ctx, {
@@ -237,8 +242,8 @@
                     }],
                     yAxes: [{
                         ticks: {
-                            min: 0,
-                            max: maxAmount,
+                            min: 8000000,
+                            max: 16000000,
                             maxTicksLimit: 5
                         },
                         gridLines: {
