@@ -85,3 +85,52 @@ def district():
     result = result.to_dict(orient="records")
 
     return jsonify(result)
+
+# 건물유형 연도별 매매가 상승률 추이
+@main_bp.route('/building', methods=['POST'])
+def building():
+    # DataFrame으로 변환
+    stmt = select(RealEstateTransaction)
+    df_ret = pd.read_sql(stmt, db.session.connection())
+    
+    # 전체 구 | 평단가 계산 | 건물 가격 단위(만원) | 건물 면적 단위 (m^2) | 모든 건물의 평균 단가 개발 계산 | price_per_sqm 컬럼 생성
+    def calc_price_per_sqm(df):
+        df = df.copy()
+        df['price_per_sqm'] = (
+            df['amount'] * 10000
+        ) / df['building_area']
+        return df
+
+    def calc_yearly_avg_price_by_building(df):
+        return (
+            df
+            .groupby(['building_use', 'reception_year'])
+            .agg(
+                avg_price_per_sqm=('price_per_sqm', 'mean'),
+                transactions_counts=('price_per_sqm', 'count')
+            )
+            .reset_index()
+            .sort_values(['building_use', 'reception_year'])
+        )
+
+    def calc_yoy_change_rate_by_building(df):
+        df = df.copy()
+
+        df['yoy_change_rate'] = (
+            df
+            .groupby('building_use')['avg_price_per_sqm']
+            .pct_change()
+            .mul(100)
+            .round(2)
+        )
+
+        return df
+
+    avg_df = calc_price_per_sqm(df_ret)
+    building_df = calc_yearly_avg_price_by_building(avg_df)
+    result = calc_yoy_change_rate_by_building(building_df)
+
+    result.fillna('-', inplace=True)
+    result = result.to_dict(orient="records")
+
+    return jsonify(result)
