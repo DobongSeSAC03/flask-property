@@ -5,7 +5,32 @@
 {% block content %}
 <h1>APIs</h1>
 <ul>
-    <li><a href="{{ url_for('api.get_real_estate_transactions') }}">Real Estate Transactions</a></li>
-    <li><a href="{{ url_for('api.get_public_parkings') }}">Public Parkings</a></li>
+    <li><a href="#" onclick="getRealEstateTransactions()">Real Estate Transactions</a></li>
+    <li><a href="#" onclick="getPublicParkings()">Public Parkings</a></li>
 </ul>
+<div id="result">
+    <textarea id="result-textarea" rows="20" cols="100" readonly></textarea>
+</div>
+<script>
+    function getRealEstateTransactions() {
+        fetch('/api/real_estate_transactions')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result-textarea').value = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Error fetching real estate transactions:', error);
+            });
+    }
+    function getPublicParkings() {
+        fetch('/api/public_parkings')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result-textarea').value = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Error fetching public parkings:', error);
+            });
+    }
+</script>
 {% endblock %}
