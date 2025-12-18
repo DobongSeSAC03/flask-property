@@ -17,6 +17,7 @@ def predict_by_loaction():
     input_district_name = data.get('district')
     input_legal_dong_name = data.get('dong')
     input_building_use = data.get('building_type')
+    input_amount = data.get('amount')
 
     # SQLAlchemy를 사용하여 데이터 가져오기
     # transactions = RealEstateTransaction.query.limit(5).all()
@@ -25,6 +26,11 @@ def predict_by_loaction():
     # DataFrame으로 변환
     stmt = select(RealEstateTransaction)
     df_ret = pd.read_sql(stmt, db.session.connection())
+
+    # 건물 가격 필터링
+    def filter_by_amount(df, building_amount):
+        building_amount = int(building_amount)
+        return df[df['amount'] < building_amount].copy()
 
     # 건물 유형 필터링
     def filter_by_building_type(df, building_type):
@@ -113,8 +119,22 @@ def predict_by_loaction():
         )
         return df
 
+    # 원본 데이터 할당
+    district_df = df_ret
 
-    district_df = filter_by_district(df_ret, input_district_name)
+    # 입력받은 건물 가격이 있으면 원본 데이터를 건물 가격 언더로만 필터링 후 지역구로 필터링
+    # 건물 가격을 받지 않으면 원본 데이터를 지역구에서만 필터링
+    if input_amount is not None:
+        district_df = filter_by_amount(district_df, input_amount)
+
+    # 건물 유형이 있으면 원본 데이터를 건물 유형에 맞게 필터링 후 지역구로 필터링
+    # 건물 유형이 없으면 원본 데이터를 지역구에서만 필터링
+    if input_building_use is not None:
+        district_df = filter_by_building_type(district_df, input_building_use)
+
+    # 지역구 필터링
+    district_df = filter_by_district(district_df, input_district_name)
+
     district_df = calc_price_per_sqm(district_df)
 
     yearly_avg_price = calc_yearly_avg_price(district_df)
@@ -125,17 +145,15 @@ def predict_by_loaction():
 
     # 랭킹으로 정렬
     yearly_avg_price = yearly_avg_price.sort_values(
-        by='change_rank',
-        ascending=True   # 1위부터
+        ['change_rank', 'reception_year']
     )
 
+    # 법정도 유무에 따른 프론트 던지기
     if input_legal_dong_name is not None:
         yearly_avg_price = yearly_avg_price[
             yearly_avg_price['legal_dong_name'] == input_legal_dong_name
         ]
 
     yearly_avg_price['yoy_change_rate'].fillna('-', inplace=True)
-    result = yearly_avg_price.to_dict()
-    print(yearly_avg_price)
-
+    result = yearly_avg_price.to_dict(orient="records")
     return jsonify(result)
