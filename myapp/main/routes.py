@@ -9,7 +9,7 @@ from myapp import db
 def index():
     return render_template('main/index.html')
 
-@main_bp.route('/', methods=['POST'])
+@main_bp.route('/district', methods=['POST'])
 def district():
     # DataFrame으로 변환
     stmt = select(RealEstateTransaction)
@@ -27,7 +27,7 @@ def district():
         return (
             df
             .groupby(['district_name', 'reception_year'])
-            .agg(avg_price_per_sqm=('price_per_sqm', 'mean'))
+            .agg(avg_price_per_sqm=('price_per_sqm', 'mean'),transaction_count=('price_per_sqm', 'count'))
             .reset_index()
             .sort_values(['district_name', 'reception_year'])
         )
@@ -35,9 +35,12 @@ def district():
     # 전체 상승률 계산
     def calc_total_change_rate_by_district(df):
         total_rate = (
-            df
-            .groupby('district_name')['avg_price_per_sqm']
-            .agg(first='first', last='last')
+            df.groupby('district_name')
+            .agg(
+                first=('avg_price_per_sqm', 'first'),
+                last=('avg_price_per_sqm', 'last'),
+                transaction_count=('transaction_count', 'sum'),
+                )
             .reset_index()
         )
 
@@ -47,6 +50,7 @@ def district():
         ).round(2)
 
         return total_rate
+
 
     # 순위 출력
     def apply_total_change_rank(df):
