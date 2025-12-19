@@ -5,7 +5,7 @@ from sqlalchemy import select
 from myapp.models import PublicParking
 from myapp import db
 
-@parking_bp.route('/parking', methods=['POST'])
+@parking_bp.route('', methods=['POST'])
 def parking():
     data = request.get_json()
     input_district_name = data.get('district')

@@ -1,7 +1,146 @@
 {% extends "base.html" %}
-
-{% block title %}Microservice App - Home{% endblock %}
+{% block title %}부동산 실거래가 예측 - SMART LOCATION RECOMMENDER{% endblock %}
 
 {% block content %}
-<h1>query</h1>
+<div class="container-fluid px-4">
+  <h1 class="mt-4">부동산 매물검색</h1>
+  <div class="row">
+    <!-- Left Column: Search Conditions -->
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-search me-1"></i>
+          검색 조건
+        </div>
+        <div class="card-body">
+          <form id="searchForm">
+            <div class="mb-3">
+              <label for="amountInput" class="form-label">자본금 (만원)</label>
+              <input type="number" class="form-control" id="amountInput" placeholder="예: 50000 (선택사항)">
+            </div>
+            <div class="mb-3">
+              <label for="buildingTypeInput" class="form-label">건물유형</label>
+              <select class="form-select" id="buildingTypeInput">
+                <option value="" selected>전체</option>
+                <option value="아파트">아파트</option>
+                <option value="연립다세대">연립다세대</option>
+                <option value="단독다가구">단독다가구</option>
+                <option value="오피스텔">오피스텔</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="districtInput" class="form-label">자치구</label>
+              <input type="text" class="form-control" id="districtInput" placeholder="예: 성북구">
+            </div>
+            <div class="mb-3">
+              <label for="dongInput" class="form-label">법정동</label>
+              <input type="text" class="form-control" id="dongInput" placeholder="예: 장위동 (선택사항)">
+            </div>
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-primary" onclick="getRealEstateTransactions()">조회</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Right Column: Prediction Results -->
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-table me-1"></i>
+          분석 결과 목록 (데이터는 상위 1000개까지 표시됩니다.)
+        </div>
+        <div class="card-body">
+          <table class="table table-hover table-striped align-middle">
+            <colgroup>
+              <col style="width: 15%;">
+              <col style="width: 15%;">
+              <col style="width: 25%;">
+              <col style="width: 10%;">
+              <col style="width: 15%;">
+              <col style="width: 10%;">
+              <col style="width: 10%;">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>자치구</th>
+                <th>법정동</th>
+                <th>건물명</th>
+                <th>평수</th>
+                <th>금액</th>
+                <th>건축연도</th>
+                <th>건물유형</th>
+              </tr>
+            </thead>
+            <tbody id="prediction-results">
+              <tr>
+                <td colspan="7" class="text-center">검색 조건을 입력하고 조회 버튼을 누르세요.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function getRealEstateTransactions() {
+    const amount = document.getElementById('amountInput').value;
+    const buildingType = document.getElementById('buildingTypeInput').value;
+    const district = document.getElementById('districtInput').value;
+    const dong = document.getElementById('dongInput').value;
+
+    const resultTable = document.getElementById('prediction-results');
+
+    // Loading state
+    resultTable.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>';
+
+    fetch("/query/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: amount ? amount : null,
+        building_type: buildingType ? buildingType : null,
+        district: district ? district : null,
+        dong: dong ? dong : null
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        resultTable.innerHTML = ''; // Clear loading
+
+        if (!data || data.length === 0) {
+          resultTable.innerHTML = '<tr><td colspan="7" class="text-center">데이터가 없습니다.</td></tr>';
+          return;
+        }
+
+        // @Data is expected to be a list of records sorted by rank (and year)
+        
+        data = data.slice(0, 1000);
+
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.district_name}</td>
+            <td>${item.legal_dong_name}</td>
+            <td>${item.building_name}</td>
+            <td>${item.building_area}</td>
+            <td>${item.amount}</td>
+            <td>${item.construction_year}</td>
+            <td>${item.building_use}</td>
+          `;
+          resultTable.appendChild(row);
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        resultTable.innerHTML = '<tr><td colspan="6" class="text-center text-danger">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
+      });
+  }
+</script>
 {% endblock %}
