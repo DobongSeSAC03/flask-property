@@ -5,7 +5,7 @@ from sqlalchemy import select
 from myapp.models import PublicParking
 from myapp import db
 
-@parking_bp.route('', methods=['POST'])
+@parking_bp.route('/data', methods=['POST'])
 def parking():
     data = request.get_json()
     input_district_name = data.get('district')
@@ -42,11 +42,9 @@ def parking():
 
     parking['available_spaces'] = (parking['total_spaces'] - parking['current_parking'])    # 총 주차면수 - 주차차량수 = 주차가능한 공간을 컬럼으로 생성 
     parking['available_spaces'] = parking['available_spaces'].astype(int)                   # 실수형 컬럼을 정수형으로 변환함
+    
+    result = parking.copy()
 
-    def filter_by_district(df, input_district_name):
-        return df[df['Area_Gu']==input_district_name].copy()
-
-    result = filter_by_district(parking, input_district_name)
     if input_dong_name is not None:
         result = result[result['Area_Dong'] == input_dong_name]
     
