@@ -1,13 +1,312 @@
 {% extends "base.html" %}
 
-{% block title %}Microservice App - Home{% endblock %}
+{% block title %}Dashboard - SMART LOCATION RECOMMENDER{% endblock %}
 
 {% block content %}
-<h2>Welcome to the Microservice Structure Demo</h2>
-<p>이 애플리케이션은 Flask의 Application Factory 패턴과 Blueprint를 사용하여 구조화되었습니다.</p>
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Dashboard</h1>
+    <div class="row">
+        <!-- Left Column: Area Chart -->
+        <div class="col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-area me-1"></i>
+                    서울시 실거래가 추이
+                </div>
+                <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+            </div>
+        </div>
+        <!-- Right Column: Bar Chart -->
+        <div class="col-sm-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    서울시 자치구별 실거래가 상승률
+                </div>
+                <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
+            </div>
+        </div>
+    </div>
+    <!-- Bottom Row: Data Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            서울시 법정동별 실거래가 상승률 TOP 5
+        </div>
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>자치구</th>
+                        <th>법정동</th>
+                        <th>상승률(%)</th>
+                        <th>평단가(만원)</th>
+                        <th>거래수</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
 
-<div style="text-align: center; margin-top: 30px;">
-    <a href="{{ url_for('auth.login') }}" class="button">로그인 하러 가기</a>
-    <a href="{{ url_for('auth.register') }}" class="button" style="background-color: #28a745;">회원가입</a>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let districtData = [];
+    let buildingData = [];
+    let dongData = [];
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        await fetchBuildingData();
+        await fetchDistrictData();
+        initChart();
+        await fetchDongData();
+    });
+
+    const fetchDongData = async () => {
+        const response = await fetch(
+            '/predict/location',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                })
+            }
+        )
+        let data = await response.json()
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = '';
+        data = data.filter(item => item.change_rank < 6);
+        let legal_dong_name = ''
+        data.forEach(item => {
+            item.transaction_count = data
+                .filter(d => d.legal_dong_name === item.legal_dong_name)
+                .reduce((sum, d) => sum + d.transaction_count, 0);
+        });
+
+        data.forEach(item => {
+            if (legal_dong_name !== item.legal_dong_name) {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                        <td>${item.district_name}</td>
+                        <td>${item.legal_dong_name}</td>
+                        <td>${item.total_change_rate}</td>
+                        <td>${item.price_per_sqm_format}</td>
+                        <td>${item.transaction_count}</td>
+                    `;
+                tableBody.appendChild(row);
+            }
+            legal_dong_name = item.legal_dong_name
+        });
+    }
+
+    const fetchDistrictData = async () => {
+        const response = await fetch(
+            '/district',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                })
+            }
+        )
+        districtData = await response.json()
+    }
+
+    const fetchBuildingData = async () => {
+        const response = await fetch(
+            '/building',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                })
+            }
+        )
+        buildingData = await response.json()
+    }
+
+    const initChart = () => {
+        // Set new default font family and font color to mimic Bootstrap's default styling
+        Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#292b2c';
+
+        let labelsBuilding = [];
+        let datasetsBuilding = {};
+        let maxAmount = 0;
+        let minAmount = 0;
+        buildingData.forEach(item => {
+            if (item.building_use === '아파트') {
+                labelsBuilding.push(item.reception_year);
+            }
+            if (!datasetsBuilding[item.building_use]) {
+                datasetsBuilding[item.building_use] = [];
+            }
+            datasetsBuilding[item.building_use].push(item.avg_price_per_sqm);
+            if (maxAmount < item.avg_price_per_sqm) {
+                maxAmount = item.avg_price_per_sqm;
+            }
+            if (minAmount > item.avg_price_per_sqm) {
+                minAmount = item.avg_price_per_sqm;
+            }
+        });
+        // maxAmount = Math.ceil(maxAmount / 1000000) * 1000000;
+        // minAmount = Math.floor(minAmount / 1000000) * 1000000;
+        // Area Chart Example
+        var ctx = document.getElementById("myAreaChart");
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labelsBuilding,
+                datasets: [
+                    {
+                        label: "아파트",
+                        lineTension: 0.3,
+                        backgroundColor: "rgba(2,117,216,0.2)",
+                        borderColor: "rgba(2,117,216,1)",
+                        pointRadius: 5,
+                        pointBackgroundColor: "rgba(2,117,216,1)",
+                        pointBorderColor: "rgba(255,255,255,0.8)",
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(2,117,216,1)",
+                        pointHitRadius: 50,
+                        pointBorderWidth: 2,
+                        data: datasetsBuilding['아파트'],
+                    },
+                    {
+                        label: "오피스텔",
+                        lineTension: 0.3,
+                        backgroundColor: "rgba(40,167,69,0.2)",
+                        borderColor: "rgba(40,167,69,1)",
+                        pointRadius: 5,
+                        pointBackgroundColor: "rgba(40,167,69,1)",
+                        pointBorderColor: "rgba(255,255,255,0.8)",
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(40,167,69,1)",
+                        pointHitRadius: 50,
+                        pointBorderWidth: 2,
+                        data: datasetsBuilding['오피스텔'],
+                    },
+                    {
+                        label: "단독다가구",
+                        lineTension: 0.3,
+                        backgroundColor: "rgba(255,119,168,0.2)",
+                        borderColor: "rgba(255,119,168,1)",
+                        pointRadius: 5,
+                        pointBackgroundColor: "rgba(255,119,168,1)",
+                        pointBorderColor: "rgba(255,255,255,0.8)",
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(255,119,168,1)",
+                        pointHitRadius: 50,
+                        pointBorderWidth: 2,
+                        data: datasetsBuilding['단독다가구'],
+                    },
+                    {
+                        label: "연립다세대",
+                        lineTension: 0.3,
+                        backgroundColor: "rgba(255,119,168,0.2)",
+                        borderColor: "rgba(255,119,168,1)",
+                        pointRadius: 5,
+                        pointBackgroundColor: "rgba(255,119,168,1)",
+                        pointBorderColor: "rgba(255,255,255,0.8)",
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(255,119,168,1)",
+                        pointHitRadius: 50,
+                        pointBorderWidth: 2,
+                        data: datasetsBuilding['연립다세대'],
+                    }
+                ],
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        time: {
+                            unit: 'date'
+                        },
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            min: 8000000,
+                            max: 16000000,
+                            maxTicksLimit: 5
+                        },
+                        gridLines: {
+                            color: "rgba(0, 0, 0, .125)",
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+
+
+        // districtData
+        let labelsDistrict = [];
+        let dataDistrict = [];
+        districtData.forEach(item => {
+            labelsDistrict.push(item.district_name);
+            dataDistrict.push(item.total_change_rate);
+        });
+        // Bar Chart Example
+        var ctx = document.getElementById("myBarChart");
+        var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsDistrict,
+                datasets: [{
+                    label: labelsDistrict,
+                    backgroundColor: "rgba(2,117,216,1)",
+                    borderColor: "rgba(2,117,216,1)",
+                    data: dataDistrict,
+                }],
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        time: {
+                            unit: 'month'
+                        },
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 25
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            min: -30,
+                            max: 80,
+                            maxTicksLimit: 5
+                        },
+                        gridLines: {
+                            display: true
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+    }
+</script>
 {% endblock %}

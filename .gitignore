@@ -5,8 +5,11 @@ env/
 instance/
 *.pyc
 *.log
-*.sqlite
+# *.sqlite
 *.db
 .idea/
 uploads/
 .env
+data/
+migrations/
+.DS_Store
