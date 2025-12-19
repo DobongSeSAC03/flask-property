@@ -1,10 +1,11 @@
 from flask import jsonify, render_template
 from . import api_bp
-from myapp.models import RealEstateTransaction, PublicParking
+from myapp.models import RealEstateTransaction, PublicParking, Api
 
 @api_bp.route('/', methods=['GET','POST'])
 def apis():
-    return render_template('api/apis.html')
+    apis = Api.query.all()
+    return render_template('api/apis.html', apis=apis)
 
 @api_bp.route('/real_estate_transactions', methods=['GET','POST'])
 def get_real_estate_transactions():

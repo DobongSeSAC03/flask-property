@@ -30,6 +30,7 @@ class RealEstateTransaction(db.Model):
     def __repr__(self):
         return f'<RealEstateTransaction {self.id} {self.building_name}>'
 
+# 공공 주차장 테이블
 class PublicParking(db.Model):
     __tablename__ = 'public_parking'
 
@@ -81,3 +82,16 @@ class PublicParking(db.Model):
 
     def __repr__(self):
         return f'<PublicParking {self.parking_code} {self.parking_name}>'
+
+# apis 테이블
+class Api(db.Model):
+    __tablename__ = 'api'
+    id = db.Column(db.Integer, primary_key=True) # api id ex) 1
+    name = db.Column(db.String(50), nullable=False) # api 이름 ex) 부동산 실거래가 조회
+    description = db.Column(db.String(255)) # api 설명 ex) 부동산 실거래가 조회
+    endpoint = db.Column(db.String(100), nullable=False) # api 엔드포인트 ex) /api/real_estate_transactions
+    method = db.Column(db.String(10), nullable=False) # api 메소드 ex) GET, POST
+    data_sample = db.Column(db.String(255)) # api 데이터 샘플 ex) {"key":"value"}
+    
+    def __repr__(self):
+        return f'<Api {self.id} {self.name}>'
