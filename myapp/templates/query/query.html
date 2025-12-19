@@ -55,9 +55,10 @@
             <colgroup>
               <col style="width: 15%;">
               <col style="width: 15%;">
-              <col style="width: 25%;">
+              <col style="width: 15%;">
               <col style="width: 10%;">
               <col style="width: 15%;">
+              <col style="width: 10%;">
               <col style="width: 10%;">
               <col style="width: 10%;">
             </colgroup>
@@ -70,11 +71,12 @@
                 <th>금액</th>
                 <th>건축연도</th>
                 <th>건물유형</th>
+                <th>총주자면적</th>
               </tr>
             </thead>
             <tbody id="prediction-results">
               <tr>
-                <td colspan="7" class="text-center">검색 조건을 입력하고 조회 버튼을 누르세요.</td>
+                <td colspan="8" class="text-center">검색 조건을 입력하고 조회 버튼을 누르세요.</td>
               </tr>
             </tbody>
           </table>
@@ -87,7 +89,7 @@
 
 {% block scripts %}
 <script>
-  function getRealEstateTransactions() {
+  async function getRealEstateTransactions() {
     const amount = document.getElementById('amountInput').value;
     const buildingType = document.getElementById('buildingTypeInput').value;
     const district = document.getElementById('districtInput').value;
@@ -96,9 +98,9 @@
     const resultTable = document.getElementById('prediction-results');
 
     // Loading state
-    resultTable.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>';
+    resultTable.innerHTML = '<tr><td colspan="8" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>';
 
-    fetch("/query/search", {
+    let res = await fetch("/query/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -110,37 +112,48 @@
         dong: dong ? dong : null
       }),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        resultTable.innerHTML = ''; // Clear loading
+    let data = await res.json()
 
-        if (!data || data.length === 0) {
-          resultTable.innerHTML = '<tr><td colspan="7" class="text-center">데이터가 없습니다.</td></tr>';
-          return;
-        }
+    let res2 = await fetch("/parking/data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: amount ? amount : null,
+        building_type: buildingType ? buildingType : null,
+        district: district ? district : null,
+        dong: dong ? dong : null
+      }),
+    })
+    let data2 = await res2.json()
+    
+    resultTable.innerHTML = ''; // Clear loading
 
-        // @Data is expected to be a list of records sorted by rank (and year)
-        
-        data = data.slice(0, 1000);
+    if (!data || data.length === 0) {
+      resultTable.innerHTML = '<tr><td colspan="8 class="text-center">데이터가 없습니다.</td></tr>';
+      return;
+    }
 
-        data.forEach(item => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${item.district_name}</td>
-            <td>${item.legal_dong_name}</td>
-            <td>${item.building_name}</td>
-            <td>${item.building_area}</td>
-            <td>${item.amount}</td>
-            <td>${item.construction_year}</td>
-            <td>${item.building_use}</td>
-          `;
-          resultTable.appendChild(row);
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        resultTable.innerHTML = '<tr><td colspan="6" class="text-center text-danger">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
-      });
+    // @Data is expected to be a list of records sorted by rank (and year)
+    
+    data = data.slice(0, 1000);
+
+    data.forEach(item => {
+      const row = document.createElement('tr');
+      const total_spaces = data2.find(p => p.Area_Dong === item.legal_dong_name)?.total_spaces || 'N/A';
+      row.innerHTML = `
+        <td>${item.district_name}</td>
+        <td>${item.legal_dong_name}</td>
+        <td>${item.building_name}</td>
+        <td>${item.building_area}</td>
+        <td>${item.amount}</td>
+        <td>${item.construction_year}</td>
+        <td>${item.building_use}</td>
+        <td>${total_spaces}</td>
+      `;
+      resultTable.appendChild(row);
+    });
   }
 </script>
 {% endblock %}
