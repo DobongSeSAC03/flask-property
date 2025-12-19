@@ -2,7 +2,12 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     margin: 0;
-    padding: 20px;
+    padding-top: 56px;
+    /* Height of fixed navbar */
+    padding-bottom: 60px;
+    /* Height of fixed footer */
+    padding-left: 20px;
+    padding-right: 20px;
     background-color: #f4f4f4;
     color: #333;
 }
