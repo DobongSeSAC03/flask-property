@@ -51,4 +51,3 @@ def parking():
     result=result.to_dict(orient='records')
 
     return jsonify(result)
-
