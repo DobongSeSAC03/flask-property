@@ -17,7 +17,7 @@ def search():
     input_district_name = data.get('district')
     input_legal_dong_name = data.get('dong')
     input_building_use = data.get('building_type')
-    input_amount = data.get('amount')
+    input_amount = int(data.get('amount')) if data.get('amount') and data.get('amount').isdecimal() else None
     
     #DataFrame으로 변환
     stmt = select(RealEstateTransaction)

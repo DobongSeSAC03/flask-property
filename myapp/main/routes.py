@@ -9,6 +9,7 @@ from myapp import db
 def index():
     return render_template('main/index.html')
 
+
 @main_bp.route('/district', methods=['POST'])
 def district():
     # DataFrame으로 변환

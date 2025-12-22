@@ -40,7 +40,7 @@
                         <th>자치구</th>
                         <th>법정동</th>
                         <th>상승률(%)</th>
-                        <th>평단가(만원)</th>
+                        <th>평단가(원)</th>
                         <th>거래수</th>
                     </tr>
                 </thead>
@@ -96,7 +96,7 @@
                 row.innerHTML = `
                         <td>${item.district_name}</td>
                         <td>${item.legal_dong_name}</td>
-                        <td>${item.total_change_rate}</td>
+                        <td><span class="${item.total_change_rate > 0 ? 'text-danger' : 'text-primary'} fw-bold">${item.total_change_rate}%</span></td>
                         <td>${item.price_per_sqm_format}</td>
                         <td>${item.transaction_count}</td>
                     `;

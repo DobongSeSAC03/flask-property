@@ -14,12 +14,7 @@ RECOMMENDER{% endblock %} {% block content %}
           <form id="searchForm">
             <div class="mb-3">
               <label for="amountInput" class="form-label">자본금 (만원)</label>
-              <input
-                type="number"
-                class="form-control"
-                id="amountInput"
-                placeholder="예: 50000 (선택사항)"
-              />
+              <input type="number" class="form-control" id="amountInput" placeholder="예: 50000 (선택사항)" />
             </div>
             <div class="mb-3">
               <label for="buildingTypeInput" class="form-label">건물유형</label>
@@ -33,28 +28,14 @@ RECOMMENDER{% endblock %} {% block content %}
             </div>
             <div class="mb-3">
               <label for="districtInput" class="form-label">자치구</label>
-              <input
-                type="text"
-                class="form-control"
-                id="districtInput"
-                placeholder="예: 성북구"
-              />
+              <input type="text" class="form-control" id="districtInput" placeholder="예: 성북구" />
             </div>
             <div class="mb-3">
               <label for="dongInput" class="form-label">법정동</label>
-              <input
-                type="text"
-                class="form-control"
-                id="dongInput"
-                placeholder="예: 장위동 (선택사항)"
-              />
+              <input type="text" class="form-control" id="dongInput" placeholder="예: 장위동 (선택사항)" />
             </div>
             <div class="d-grid gap-2">
-              <button
-                type="button"
-                class="btn btn-primary"
-                onclick="getRealEstateTransactions()"
-              >
+              <button type="button" class="btn btn-primary" onclick="getRealEstateTransactions()">
                 조회
               </button>
             </div>
