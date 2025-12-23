@@ -99,17 +99,21 @@ def predict_by_loaction():
         return df
     # 원본 데이터 할당
     district_df = df_ret
+    
     # 입력받은 건물 가격이 있으면 원본 데이터를 건물 가격 언더로만 필터링 후 지역구로 필터링
     # 건물 가격을 받지 않으면 원본 데이터를 지역구에서만 필터링
     if input_amount is not None:
         district_df = filter_by_amount(district_df, input_amount)
+    
     # 건물 유형이 있으면 원본 데이터를 건물 유형에 맞게 필터링 후 지역구로 필터링
     # 건물 유형이 없으면 원본 데이터를 지역구에서만 필터링
     if input_building_use is not None:
         district_df = filter_by_building_type(district_df, input_building_use)
+    
     # 지역구 필터링
     if input_district_name is not None:
         district_df = filter_by_district(district_df, input_district_name)
+    
     district_df = calc_price_per_sqm(district_df)
     yearly_avg_price = calc_yearly_avg_price(district_df)
     yearly_avg_price = format_price_column(yearly_avg_price)
