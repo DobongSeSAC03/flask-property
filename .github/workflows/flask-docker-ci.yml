@@ -76,7 +76,7 @@ jobs:
             docker stop flask-property || true
             docker rm flask-property || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/flask-property
-            docker run -d --name flask-property -p 5000:5000 ${{ secrets.DOCKERHUB_USERNAME }}/flask-property
+            docker run -d --name flask-property -p 5050:5050 ${{ secrets.DOCKERHUB_USERNAME }}/flask-property
 
       # 10. 작업 후 보안 그룹에서 GitHub IP 제거
       - name: Remove IP from security group
