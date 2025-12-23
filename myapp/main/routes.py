@@ -17,6 +17,9 @@ def district():
     - DB에서 원본데이터를 로드하지 않고, 이미 정제된 컬럼만 가져오기
     - 프론트 지역구 막대 그래프 데이터 제공
     - 위의 리팩토링이 완료 되면, Spring의 Service, Repository 처럼 관심사 분리 리팩토링 예정
+    Before: total waiting for server response: 1.44s
+    After: total waiting for server response: 0.14s
+            (1.44 -0.14) /1.44 ×100 ≈90.3% 개선
     """
     # Task 1: DB에서 연도별 지역구 평균 평단가 + 거래수 계산
     def fetch_yearly_avg_price_by_district():
@@ -131,6 +134,9 @@ def building():
     리팩토링 목적:
     - DB에서 원본데이터를 로드하지 않고, 이미 정제된 컬럼만 가져오기
     - 프론트 건물 유형 꺽은 선 그래프 데이터 제공
+    Before: total waiting for server response: 1.81s
+    After: total waiting for server response: 0.26s
+            (1.81 -0.26) /1.81 ×100 ≈85.6% 개선
     """
 
     # Task1: 건물 유형, 연도별로 컬럼 select, 연도별 평균 평단가 계산, df 변환
