@@ -2,9 +2,9 @@ name: Python Flask CI with Docker
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   deploy:
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -40,3 +40,50 @@ jobs:
       # (2) Docker 이미지 빌드 3) Docker Hub push
       - name: docker Hub push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/flask-property
+
+      # 6. GitHub Runner의 공인 IP 조회
+      - name: get GitHub IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      # 7. AWS Credentials 설정 (IAM 액세스 키 사용)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # 8. GitHub IP를 EC2 보안 그룹에 임시 허용
+      - name: Add GitHub IP to AWS
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      # 9. EC2에 SSH 접속해서 컨테이너 재기동
+      - name: AWS EC2 Connection
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          password: ${{ secrets.EC2_PASSWORD }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          timeout: 60s
+          script: |
+            docker stop flask-property || true
+            docker rm flask-property || true
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/flask-property
+            docker run -d --name flask-property -p 5000:5000 ${{ secrets.DOCKERHUB_USERNAME }}/flask-property
+
+      # 10. 작업 후 보안 그룹에서 GitHub IP 제거
+      - name: Remove IP from security group
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
